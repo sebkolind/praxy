@@ -5,6 +5,17 @@ function updateAttribute(el: TentElement, key: string, value: any) {
     return;
   }
 
+  if (typeof value === 'object' && value !== null) {
+    const styleString = Object.entries(value)
+      .filter(([_, v]) => v)
+      .map(([k, v]) => `${k}:${v}`)
+      .join(';');
+
+    el.setAttribute('style', styleString);
+
+    return;
+  }
+
   if (typeof value === 'boolean') {
     if (value) {
       el.setAttribute(key, '');
