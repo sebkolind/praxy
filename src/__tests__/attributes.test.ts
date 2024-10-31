@@ -1,52 +1,53 @@
-import { addAttribute } from '../attributes';
+import { updateAttribute } from '../attributes';
+import { createElement } from '../element';
 
 describe('attributes.ts', () => {
   test('adds a simple attribute', () => {
-    const el = document.createElement('div');
+    const el = createElement('div');
 
-    addAttribute(el, 'id', 'test');
+    updateAttribute(el, 'id', 'test');
 
     expect(el.getAttribute('id')).toBe('test');
   });
 
   test('adds a custom attribute', () => {
-    const el = document.createElement('div');
+    const el = createElement('div');
 
-    addAttribute(el, 'data-test', 'test');
+    updateAttribute(el, 'data-test', 'test');
 
     expect(el.getAttribute('data-test')).toBe('test');
   });
 
   test('adds and removes a boolean attribute', () => {
-    const el = document.createElement('input');
+    const el = createElement('input');
 
-    addAttribute(el, 'disabled', true);
+    updateAttribute(el, 'disabled', true);
     expect(el.hasAttribute('disabled')).toBe(true);
 
-    addAttribute(el, 'disabled', false);
+    updateAttribute(el, 'disabled', false);
     expect(el.hasAttribute('disabled')).toBe(false);
   });
 
   test('adds an assignment', () => {
-    const el = document.createElement('input');
+    const el = createElement<HTMLInputElement>('input');
 
-    addAttribute(el, 'value', 'test');
+    updateAttribute(el, 'value', 'test');
 
     expect(el.value).toBe('test');
   });
 
   test("doesn't add `mounted` as an attribute", () => {
-    const el = document.createElement('div');
+    const el = createElement('div');
 
-    addAttribute(el, 'mounted', 'test');
+    updateAttribute(el, 'mounted', 'test');
 
     expect(el.hasAttribute('mounted')).toBe(false);
   });
 
   test("doesn't add `keep` as an attribute", () => {
-    const el = document.createElement('div');
+    const el = createElement('div');
 
-    addAttribute(el, 'keep', true);
+    updateAttribute(el, 'keep', true);
 
     expect(el.hasAttribute('keep')).toBe(false);
   });

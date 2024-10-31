@@ -2,10 +2,10 @@
   "name": "@tentjs/tent",
   "version": "0.0.33-4",
   "description": "A jsx-free, super-lightweight and zero-dependency library to add interactivity to the web - without all the nonsense.",
+  "type": "module",
   "source": "src/main.ts",
-  "main": "dist/main.js",
-  "module": "dist/module.js",
-  "types": "dist/main.d.ts",
+  "module": "dist/tent.esm.js",
+  "types": "dist/tent.d.ts",
   "files": [
     "dist"
   ],

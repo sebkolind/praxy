@@ -1,15 +1,20 @@
-import { addAttribute } from './attributes';
-import { type Attrs, type TentNode } from './types';
+import { updateAttribute } from './attributes';
+import { TentElement } from './types';
+import { cleanupComponent } from './utils';
 
-function walker<A extends Attrs>(oldNode: TentNode<A>, newNode: TentNode<A>) {
+function walker(oldNode: TentElement, newNode: TentElement, nested = false) {
+  if (oldNode.isEqualNode(newNode)) {
+    return;
+  }
+
   if (oldNode.tagName !== newNode.tagName) {
     oldNode.replaceWith(newNode);
 
     return;
   }
 
-  const nc = Array.from(newNode.childNodes, (n) => n as TentNode<A>);
-  const oc = Array.from(oldNode.childNodes, (n) => n as TentNode<A>);
+  const nc = Array.from(newNode.childNodes, (n) => n);
+  const oc = Array.from(oldNode.childNodes, (n) => n);
 
   if (oldNode.nodeType === Node.TEXT_NODE) {
     if (oldNode.nodeValue !== newNode.nodeValue) {
@@ -25,43 +30,42 @@ function walker<A extends Attrs>(oldNode: TentNode<A>, newNode: TentNode<A>) {
     return;
   }
 
-  // Remove attributes that are not present in the new node
-  for (const key in oldNode.$tent.attributes) {
-    if (newNode.$tent.attributes[key] == null) {
-      delete oldNode.$tent.attributes[key];
-      if (oldNode.hasAttribute(key)) {
-        oldNode.removeAttribute(key);
-      }
+  const oldAttributes = oldNode.attributes;
+  const newAttributes = newNode.attributes;
+
+  for (let i = 0; i < newAttributes.length; i++) {
+    const newAttr = newAttributes[i];
+    const oldAttr = oldAttributes.getNamedItem(newAttr.name);
+
+    if (!oldAttr || oldAttr.value !== newAttr.value) {
+      updateAttribute(oldNode, newAttr.name, newAttr.value);
     }
   }
 
-  // Add attributes that are not present in the old node
-  const attrs = {
-    ...oldNode.$tent.attributes,
-    ...newNode.$tent.attributes,
-  };
-
-  for (const key in attrs) {
-    addAttribute(oldNode, key, attrs[key]);
+  for (let i = 0; i < oldAttributes.length; i++) {
+    const oldAttr = oldAttributes[i];
+    if (!newNode.hasAttribute(oldAttr.name)) {
+      oldNode.removeAttribute(oldAttr.name);
+    }
   }
 
   if (oc.length === 0 && nc.length === 0) return;
-  if (oldNode.$tent.attributes.keep) return;
-  if (oldNode.$tent.isComponent) return;
+  if (oldNode.$tent?.keep) return;
 
-  if (oc.length < nc.length) {
-    for (let i = 0; i < nc.length; i++) {
-      if (oc[i] == null) {
-        oldNode.append(nc[i]);
-      }
+  if (oldNode.$tent.component && !nested) {
+    if (oldNode.$tent.view !== newNode.$tent.view) {
+      cleanupComponent(oldNode);
+      oldNode.replaceWith(newNode);
+
+      return;
     }
   }
 
-  if (oc.length > nc.length) {
-    for (let i = 0; i < oc.length; i++) {
-      if (nc[i] == null) {
-        oc[i].remove();
-      }
+  for (let i = 0; i < Math.max(oc.length, nc.length); i++) {
+    if (oc[i] == null && nc[i] != null) {
+      oldNode.append(nc[i]);
+    } else if (oc[i] != null && nc[i] == null) {
+      oc[i].remove();
     }
   }
 
@@ -70,10 +74,6 @@ function walker<A extends Attrs>(oldNode: TentNode<A>, newNode: TentNode<A>) {
     const nChild = nc[i];
 
     if (nChild == null) continue;
-
-    if (oChild.tagName !== nChild.tagName) {
-      oChild.replaceWith(nChild);
-    }
 
     walker(oChild, nChild);
   }

@@ -1,6 +1,4 @@
-import { mount } from '../mount';
-import { tags } from '../tags';
-import { type Component } from '../types';
+import { render } from '../render';
 import {
   getByText,
   getByTestId,
@@ -8,17 +6,23 @@ import {
   getByRole,
   queryByText,
 } from '@testing-library/dom';
+import type { Component, StatelessComponent } from '../types';
+import { tags } from '../tags';
+import { createApp } from '../create-app';
+import { c } from '../c';
 
 const { div, p, button } = tags;
 
 beforeEach(() => {
-  document.body.innerHTML = '';
+  document.body.innerHTML = `
+    <div id="root"></div>
+  `;
 });
 
 const Counter: Component<{ count: number }> = {
   state: { count: 0 },
-  view: ({ state }) =>
-    div(
+  view({ state }) {
+    return div(
       [
         p(`Count: ${state.count}`),
         button('Increment', {
@@ -29,15 +33,25 @@ const Counter: Component<{ count: number }> = {
         }),
       ],
       { ['data-testid']: 'counter' },
-    ),
+    );
+  },
 };
 
 describe('components', () => {
   test('counter', () => {
-    mount(document.body, Counter);
+    const root = document.getElementById('root');
+    createApp(root, {
+      view() {
+        return div(c(Counter));
+      },
+    });
 
-    const el = getByTestId(document.body, 'counter');
-    const btn = getByTestId(document.body, 'increment');
+    if (!root) {
+      throw new Error('Root is null');
+    }
+
+    const el = getByTestId(root, 'counter');
+    const btn = getByTestId(root, 'increment');
 
     expect(getByText(el, /Count: 0/));
     expect(btn.className).toBe('negative');
@@ -51,39 +65,40 @@ describe('components', () => {
   });
 
   test('mounted', () => {
+    const root = document.getElementById('root');
     const mounted = jest.fn();
 
-    mount(document.body, { ...Counter, mounted });
+    if (!root) {
+      throw new Error('Root is null');
+    }
+
+    render(root, { ...Counter, mounted });
 
     expect(mounted).toHaveBeenCalledTimes(1);
   });
 
   test('with state', () => {
+    const root = document.getElementById('root');
     const WithState: Component<{ count: number }> = {
       state: { count: 0 },
-      view: ({ state }) => div(p(`Count: ${state.count}`)),
+      view({ state }) {
+        return div(p(`Count: ${state.count}`));
+      },
     };
 
-    mount(document.body, WithState);
+    render(root, WithState);
 
-    const el = getByText(document.body, /Count: 0/);
+    if (!root) {
+      throw new Error('Root is null');
+    }
 
-    expect(el).toBeDefined();
-  });
-
-  test('without state', () => {
-    const WithoutState: Component = {
-      view: () => div(p(`No state`)),
-    };
-
-    mount(document.body, WithoutState);
-
-    const el = getByText(document.body, /No state/);
+    const el = getByText(root, /Count: 0/);
 
     expect(el).toBeDefined();
   });
 
   test('keep', () => {
+    const root = document.getElementById('root');
     const KeepComponent: Component<{ count: number }> = {
       state: { count: 0 },
       view({ state }) {
@@ -101,15 +116,23 @@ describe('components', () => {
       },
     };
 
-    mount(document.body, KeepComponent);
+    createApp(root, {
+      view() {
+        return div(c(KeepComponent));
+      },
+    });
 
-    const btn = getByRole(document.body, 'button');
+    if (!root) {
+      throw new Error('Root is null');
+    }
+
+    const btn = getByRole(root, 'button');
 
     expect(btn).toBeDefined();
 
     fireEvent.click(btn);
 
-    expect(queryByText(document.body, /Don't change me 0/)).toBeTruthy();
-    expect(queryByText(document.body, /Don't change me 1/)).toBeNull();
+    expect(queryByText(root, /Don't change me 0/)).toBeTruthy();
+    expect(queryByText(root, /Don't change me 1/)).toBeNull();
   });
 });

@@ -1,10 +1,6 @@
-import { type TentNode, type Attrs, type TagAttrsValues } from './types';
+import { TentElement } from './types';
 
-function addAttribute<A extends Attrs>(
-  el: TentNode<A> | HTMLElement,
-  key: string,
-  value: TagAttrsValues,
-) {
+function updateAttribute(el: TentElement, key: string, value: any) {
   if (key === 'mounted' || key === 'keep') {
     return;
   }
@@ -28,4 +24,4 @@ function addAttribute<A extends Attrs>(
   }
 }
 
-export { addAttribute };
+export { updateAttribute };

@@ -1,57 +1,57 @@
-import { addAttribute } from './attributes';
-import { mount } from './mount';
-import {
-  type Tags,
-  type Context,
-  type TentNode,
-  Component,
-  Children,
-} from './types';
+import type { C, TagChild, TagContext, Tags, TentElement } from './types';
+import { updateAttribute } from './attributes';
+import { render } from './render';
 
-function createTag(context: Context) {
+function createTag(context: TagContext) {
   const [tag, children, attributes] = context;
 
-  const el = document.createElement(tag) as TentNode;
+  const el = document.createElement(tag) as TentElement;
 
   el.$tent = {
-    attributes: {},
+    props: null,
+    view: null,
+    component: null,
+    keep: attributes?.keep ?? null,
+    initState: null,
   };
 
   for (const key in attributes) {
-    const value = attributes[key];
-
-    el.$tent.attributes[key] = value;
-
-    addAttribute(el, key, value);
+    updateAttribute(el, key, attributes[key]);
   }
 
   if (Array.isArray(children)) {
     for (let i = 0; i < children.length; i++) {
-      const c = children[i];
-
-      if (Array.isArray(c)) {
-        el.append(createTag(c));
-      } else if (isComponent(c)) {
-        mount(el, c);
-      } else {
-        el.append(c);
-      }
+      renderChildren(el, children[i]);
     }
   } else {
-    if (isComponent(children)) {
-      mount(el, children);
-    } else {
-      el.append(typeof children === 'number' ? children.toString() : children);
-    }
+    renderChildren(el, children);
   }
-
-  attributes?.mounted?.({ el });
 
   return el;
 }
 
-function isComponent(children: Children): children is Component<any, any> {
-  return typeof children === 'object' && 'view' in children;
+function renderChildren(el: TentElement, child: TagChild) {
+  if (child == null) {
+    createFragment(el);
+    return;
+  }
+
+  if (isComponent(child)) {
+    const { component, props } = child;
+    render(el, component, props, true);
+  } else {
+    el.append(typeof child === 'number' ? child.toString() : child);
+  }
+}
+
+function isComponent(child: NonNullable<TagChild>): child is C<any, any> {
+  return typeof child === 'object' && 'component' in child;
+}
+
+function createFragment(el: TentElement) {
+  const fragment = document.createTextNode('');
+
+  el.append(fragment);
 }
 
 const tags: Tags = {};
@@ -106,7 +106,7 @@ const tagsArray = [
 for (let i = 0; i < tagsArray.length; i++) {
   const tag = tagsArray[i];
 
-  tags[tag] = (children, attrs) => createTag([tag, children, attrs]);
+  tags[tag] = (children, attributes) => createTag([tag, children, attributes]);
 }
 
 export { tags, createTag };
