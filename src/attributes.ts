@@ -1,7 +1,12 @@
 import { TentElement } from './types';
 
 function updateAttribute(el: TentElement, key: string, value: any) {
-  if (key === 'mounted' || key === 'keep') {
+  if (key === 'keep') {
+    return;
+  }
+
+  if (value == null) {
+    el.removeAttribute(key);
     return;
   }
 
@@ -16,7 +21,7 @@ function updateAttribute(el: TentElement, key: string, value: any) {
     return;
   }
 
-  if (typeof value === 'boolean') {
+  if (typeof value === 'boolean' && !(key in el)) {
     if (value) {
       el.setAttribute(key, '');
     } else {

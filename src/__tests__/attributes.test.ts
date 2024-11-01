@@ -36,14 +36,6 @@ describe('attributes.ts', () => {
     expect(el.value).toBe('test');
   });
 
-  test("doesn't add `mounted` as an attribute", () => {
-    const el = createElement('div');
-
-    updateAttribute(el, 'mounted', 'test');
-
-    expect(el.hasAttribute('mounted')).toBe(false);
-  });
-
   test("doesn't add `keep` as an attribute", () => {
     const el = createElement('div');
 
