@@ -3,10 +3,6 @@ import { TentElement } from './types';
 import { cleanupComponent } from './utils';
 
 function walker(oldNode: TentElement, newNode: TentElement, nested = false) {
-  if (oldNode.isEqualNode(newNode)) {
-    return;
-  }
-
   if (oldNode.tagName !== newNode.tagName) {
     oldNode.replaceWith(newNode);
 
@@ -30,30 +26,37 @@ function walker(oldNode: TentElement, newNode: TentElement, nested = false) {
     return;
   }
 
-  const oldAttributes = oldNode.attributes;
-  const newAttributes = newNode.attributes;
+  const attributes = newNode.$tent.attributes;
+  if (attributes != null) {
+    attributes.forEach((key) => {
+      if (key in oldNode) {
+        if (oldNode[key] !== newNode[key]) {
+          oldNode[key] = newNode[key];
+        }
 
-  for (let i = 0; i < newAttributes.length; i++) {
-    const newAttr = newAttributes[i];
-    const oldAttr = oldAttributes.getNamedItem(newAttr.name);
+        return;
+      }
 
-    if (!oldAttr || oldAttr.value !== newAttr.value) {
-      updateAttribute(oldNode, newAttr.name, newAttr.value);
-    }
-  }
+      const oldValue = oldNode.getAttribute(key);
+      const newValue = newNode.getAttribute(key);
 
-  for (let i = 0; i < oldAttributes.length; i++) {
-    const oldAttr = oldAttributes[i];
-    if (!newNode.hasAttribute(oldAttr.name)) {
-      oldNode.removeAttribute(oldAttr.name);
-    }
+      if (newValue == null) {
+        oldNode.removeAttribute(key);
+
+        return;
+      }
+
+      if (oldValue !== newValue) {
+        updateAttribute(oldNode, key, newNode.getAttribute(key));
+      }
+    });
   }
 
   if (oc.length === 0 && nc.length === 0) return;
   if (oldNode.$tent?.keep) return;
 
   if (oldNode.$tent.component && !nested) {
-    if (oldNode.$tent.view !== newNode.$tent.view) {
+    if (oldNode.$tent.component.view !== newNode.$tent.component?.view) {
       cleanupComponent(oldNode);
       oldNode.replaceWith(newNode);
 
@@ -70,12 +73,8 @@ function walker(oldNode: TentElement, newNode: TentElement, nested = false) {
   }
 
   for (let i = 0; i < oc.length; i++) {
-    const oChild = oc[i];
-    const nChild = nc[i];
-
-    if (nChild == null) continue;
-
-    walker(oChild, nChild);
+    if (nc[i] == null) continue;
+    walker(oc[i], nc[i]);
   }
 }
 

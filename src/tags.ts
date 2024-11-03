@@ -3,20 +3,21 @@ import { updateAttribute } from './attributes';
 import { render } from './render';
 
 function createTag(context: TagContext) {
-  const [tag, children, attributes] = context;
+  const [tag, children, attrs] = context;
 
   const el = document.createElement(tag) as TentElement;
+  const attributes = Object.keys(attrs ?? {});
 
   el.$tent = {
+    attributes,
     props: null,
-    view: null,
     component: null,
-    keep: attributes?.keep ?? null,
+    keep: attributes.includes('keep') ?? null,
     initState: null,
   };
 
-  for (const key in attributes) {
-    updateAttribute(el, key, attributes[key]);
+  for (const key in attrs) {
+    updateAttribute(el, key, attrs[key]);
   }
 
   if (Array.isArray(children)) {

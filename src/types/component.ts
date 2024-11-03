@@ -5,6 +5,7 @@ type App = { view: () => TentElement };
 type Component<S = State, P = Props> = {
   view: ViewFn<S, P>;
   state: S;
+  init?: () => Promise<S>;
   mounted?: MountedFn<S, P>;
   unmounted?: () => void;
 };
@@ -25,13 +26,11 @@ type TentCustomProperties = {
 };
 type TentElement = (Element | HTMLElement) & TentCustomProperties;
 type TentObject = {
-  view: ViewFn<any, any> | null;
-  unmount?: () => void;
+  attributes?: string[];
   props: Props | null;
   initState: State | null;
   component: AnyComponent;
   keep?: boolean | null;
-  isComponent?: boolean;
 };
 
 export type { App, Component, StatelessComponent, AnyComponent, TentElement };

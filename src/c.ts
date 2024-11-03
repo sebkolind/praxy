@@ -1,5 +1,10 @@
-import type { Component, StatelessComponent, C, TentElement } from './types';
-import { AnyComponent } from './types/component';
+import type {
+  AnyComponent,
+  Component,
+  StatelessComponent,
+  C,
+  TentElement,
+} from './types';
 
 function c<S>(component: Component<S>): C<S>;
 function c<S, P>(component: Component<S, P>, props: P): C<S, P>;

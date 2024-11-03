@@ -7,16 +7,17 @@ function updateAttribute(el: TentElement, key: string, value: any) {
 
   if (value == null) {
     el.removeAttribute(key);
+
     return;
   }
 
   if (typeof value === 'object' && value !== null) {
-    const styleString = Object.entries(value)
+    const objString = Object.entries(value)
       .filter(([_, v]) => v)
       .map(([k, v]) => `${k}:${v}`)
       .join(';');
 
-    el.setAttribute('style', styleString);
+    el.setAttribute(key, objString);
 
     return;
   }

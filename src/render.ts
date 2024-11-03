@@ -3,12 +3,11 @@ import type {
   Component,
   Nullable,
   Props,
-  State,
   StatelessComponent,
   TentElement,
 } from './types';
 
-function render<S extends {}, P extends Props>(
+async function render<S extends {}, P extends Props>(
   element: Nullable<Element>,
   component: Component<S, P> | StatelessComponent<P>,
   properties = {} as P,
@@ -16,8 +15,23 @@ function render<S extends {}, P extends Props>(
 ) {
   if (element == null) return;
 
+  const { init, view, mounted } = component;
+
+  if (init != null) {
+    init().then((state) => {
+      delete component.init;
+      render(
+        element,
+        { ...component, state } as Component<S, P>,
+        properties,
+        nested,
+      );
+    });
+
+    return;
+  }
+
   let node: TentElement;
-  const { view, mounted } = component;
   const stateful = 'state' in component;
   const state = stateful ? component.state : ({} as S);
   const el = element as TentElement;
@@ -51,16 +65,14 @@ function render<S extends {}, P extends Props>(
   const context = { state: proxy, el, props };
 
   node = view(context);
-  node.$tent = {
-    props,
-    component,
-    initState: { ...state },
-    view,
-  };
+  node.$tent = { props, component, initState: { ...state } };
 
   el.append(node);
 
-  mounted?.(context);
+  if (mounted) {
+    mounted(context);
+    delete component.mounted;
+  }
 }
 
 export { render };
