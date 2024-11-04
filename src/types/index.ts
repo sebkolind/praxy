@@ -1,6 +1,5 @@
 export type { Nullable } from './utils';
 export type {
-  App,
   Component,
   AnyComponent,
   StatelessComponent,

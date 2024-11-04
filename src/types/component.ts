@@ -1,7 +1,5 @@
 import type { Props, State } from '.';
 
-type App = { view: () => TentElement };
-
 type Component<S = State, P = Props> = {
   view: ViewFn<S, P>;
   state: S;
@@ -33,4 +31,4 @@ type TentObject = {
   keep?: boolean | null;
 };
 
-export type { App, Component, StatelessComponent, AnyComponent, TentElement };
+export type { Component, StatelessComponent, AnyComponent, TentElement };

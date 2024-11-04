@@ -1,5 +1,4 @@
 export type {
-  App,
   Component,
   StatelessComponent,
   TagContext,
