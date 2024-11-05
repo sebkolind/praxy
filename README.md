@@ -16,7 +16,15 @@ npm install @tentjs/tent
 Getting started is very easy. Here's a simple example component that increments a number when the button is clicked. This example demonstrates creating a simple counter component, and creating a new app.
 
 ```typescript
-import { c, type Component, createApp, tags } from '@tentjs/tent';
+import {
+  c,
+  tags,
+  createApp,
+  type Component,
+  type StatelessComponent,
+} from '@tentjs/tent';
+
+const { div, button } = tags;
 
 type State = { count: number };
 
@@ -25,7 +33,7 @@ const Counter: Component<State> = {
   state: { count: 0 },
   // Define the view
   view({ state }) {
-    return tags.button(
+    return button(
       `You clicked ${state.count} times`,
       // Add attributes to the button
       { onclick: () => state.count++ },
@@ -33,13 +41,18 @@ const Counter: Component<State> = {
   },
 };
 
-const App = {
+const App: StatelessComponent = {
   view() {
-    return tags.div(c(Counter), { id: 'app' });
+    return div(c(Counter), { id: 'app' });
   },
 };
 
-createApp(document.getElementById('root'), App);
+createApp(
+  // The element to replace with the App component
+  document.getElementById('root'),
+  // An App component
+  App,
+);
 ```
 
 ## 💡 Examples
