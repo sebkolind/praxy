@@ -13,13 +13,10 @@ npm install @tentjs/tent
 
 ## ⚡ Quickstart
 
-Getting started is very easy. Here's a simple example component that increments a number when the button is clicked. This example demonstrates creating a stateful component, updating the state, and mounting it to the DOM.
+Getting started is very easy. Here's a simple example component that increments a number when the button is clicked. This example demonstrates creating a simple counter component, and creating a new app.
 
 ```typescript
-import { type Component, mount, tags } from '@tentjs/tent';
-
-// Tags are used to create elements - like `div`, `button`, `span`, etc.
-const { button } = tags;
+import { c, type Component, createApp, tags } from '@tentjs/tent';
 
 type State = { count: number };
 
@@ -28,7 +25,7 @@ const Counter: Component<State> = {
   state: { count: 0 },
   // Define the view
   view({ state }) {
-    return button(
+    return tags.button(
       `You clicked ${state.count} times`,
       // Add attributes to the button
       { onclick: () => state.count++ },
@@ -36,8 +33,13 @@ const Counter: Component<State> = {
   },
 };
 
-// Append the component to the body
-mount(document.body, Counter);
+const App = {
+  view() {
+    return tags.div(c(Counter), { id: 'app' });
+  },
+};
+
+createApp(document.getElementById('root'), App);
 ```
 
 ## 💡 Examples
