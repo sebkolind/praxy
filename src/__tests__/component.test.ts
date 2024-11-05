@@ -72,7 +72,10 @@ describe('components', () => {
       throw new Error('Root is null');
     }
 
-    render(root, { ...Counter, mounted });
+    render({
+      element: root,
+      component: { ...Counter, mounted },
+    });
 
     expect(mounted).toHaveBeenCalledTimes(1);
   });
@@ -86,7 +89,7 @@ describe('components', () => {
       },
     };
 
-    render(root, WithState);
+    render({ element: root, component: WithState });
 
     if (!root) {
       throw new Error('Root is null');

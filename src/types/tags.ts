@@ -1,4 +1,6 @@
-import type { Attributes, C, TentElement } from '.';
+import type { C } from './c';
+import type { Attributes } from './attributes';
+import type { TentElement } from './component';
 
 type CreateTagFn = (context: TagContext) => Tag;
 

@@ -1,4 +1,5 @@
-import type { Props, State } from '.';
+type Props = Record<string, any> & { children: AnyComponent };
+type State = Record<string, any>;
 
 type Component<S = State, P = Props> = {
   view: ViewFn<S, P>;
@@ -12,7 +13,12 @@ type StatelessComponent<P = Props> = Omit<Component<{}, P>, 'state'>;
 
 type AnyComponent = Component<any, any> | StatelessComponent<any> | null;
 
-type Context<S, P> = { state: S; el: TentElement; props: P };
+type Context<S, P> = {
+  state: S;
+  el: TentElement;
+  props: P;
+  plugins: Tent.Plugins;
+};
 
 type MountedFn<S, P> = (context: Context<S, P>) => void;
 
@@ -31,4 +37,11 @@ type TentObject = {
   keep?: boolean | null;
 };
 
-export type { Component, StatelessComponent, AnyComponent, TentElement };
+export type {
+  Component,
+  StatelessComponent,
+  AnyComponent,
+  TentElement,
+  State,
+  Props,
+};

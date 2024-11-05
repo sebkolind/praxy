@@ -1,12 +1,20 @@
 import { render } from './render';
-import type { AnyComponent, Nullable } from './types';
+import type { AnyComponent, Nullable, Plugin } from './types';
 
-function createApp(el: Nullable<Element>, app: NonNullable<AnyComponent>) {
-  if (!el) {
+function createApp(
+  element: Nullable<Element>,
+  app: NonNullable<AnyComponent>,
+  plugins: Plugin[] = [],
+) {
+  if (!element) {
     throw new Error("The root element wasn't found.");
   }
 
-  render(el, app);
+  render({
+    element,
+    component: app,
+    pluginConfigs: plugins,
+  });
 }
 
 export { createApp };

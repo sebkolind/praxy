@@ -12,8 +12,8 @@ function createTag(context: TagContext) {
     attributes,
     props: null,
     component: null,
-    keep: attributes.includes('keep') ?? null,
     initState: null,
+    keep: attributes.includes('keep') ?? null,
   };
 
   for (const key in attrs) {
@@ -39,7 +39,12 @@ function renderChildren(el: TentElement, child: TagChild) {
 
   if (isComponent(child)) {
     const { component, props } = child;
-    render(el, component, props, true);
+    render({
+      element: el,
+      component,
+      properties: props,
+      nested: true,
+    });
   } else {
     el.append(typeof child === 'number' ? child.toString() : child);
   }

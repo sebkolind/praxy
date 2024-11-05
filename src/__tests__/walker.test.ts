@@ -21,15 +21,18 @@ beforeEach(() => {
 describe('walker', () => {
   test('that it replaces when tagName differs', () => {
     const root = document.getElementById('root');
-    render(root, {
-      state: { count: 0 },
-      view({ state }) {
-        return div([
-          state.count === 0 ? p('Hello, world!') : div('Adios, world!'),
-          button('Click me', {
-            onclick: () => state.count++,
-          }),
-        ]);
+    render({
+      element: root,
+      component: {
+        state: { count: 0 },
+        view({ state }) {
+          return div([
+            state.count === 0 ? p('Hello, world!') : div('Adios, world!'),
+            button('Click me', {
+              onclick: () => state.count++,
+            }),
+          ]);
+        },
       },
     });
 
@@ -48,15 +51,18 @@ describe('walker', () => {
 
   test('when node type is a text node', () => {
     const root = document.getElementById('root');
-    render(root, {
-      state: { count: 0 },
-      view({ state }) {
-        return div([
-          state.count === 0 ? 'Hello, world!' : 'Adios, world!',
-          button('Click me', {
-            onclick: () => state.count++,
-          }),
-        ]);
+    render({
+      element: root,
+      component: {
+        state: { count: 0 },
+        view({ state }) {
+          return div([
+            state.count === 0 ? 'Hello, world!' : 'Adios, world!',
+            button('Click me', {
+              onclick: () => state.count++,
+            }),
+          ]);
+        },
       },
     });
 
@@ -75,13 +81,16 @@ describe('walker', () => {
 
   test('attributes are removed', () => {
     const root = document.getElementById('root');
-    render(root, {
-      state: { count: 0 },
-      view({ state }) {
-        return button('Click me', {
-          onclick: () => state.count++,
-          ['data-test']: state.count === 0,
-        });
+    render({
+      element: root,
+      component: {
+        state: { count: 0 },
+        view({ state }) {
+          return button('Click me', {
+            onclick: () => state.count++,
+            ['data-test']: state.count === 0,
+          });
+        },
       },
     });
 
@@ -238,7 +247,7 @@ describe('walker', () => {
     };
 
     const root = document.getElementById('root');
-    render(root, WrapperComponent);
+    render({ element: root, component: WrapperComponent });
 
     if (!root) {
       throw new Error('Root is null');
