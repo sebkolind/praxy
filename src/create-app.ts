@@ -1,19 +1,26 @@
 import { render } from './render';
-import type { AnyComponent, Nullable, Plugin } from './types';
+import type { Nullable, Plugin, StatelessComponent } from './types';
 
 function createApp(
   element: Nullable<Element>,
-  app: NonNullable<AnyComponent>,
+  app: StatelessComponent,
   plugins: Plugin[] = [],
 ) {
   if (!element) {
     throw new Error("The root element wasn't found.");
   }
 
+  if ('state' in app) {
+    throw new Error(
+      'The app component can not have state. Use the `StatelessComponent` type instead.',
+    );
+  }
+
   render({
     element,
     component: app,
     pluginConfigs: plugins,
+    createApp: true,
   });
 }
 

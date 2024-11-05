@@ -8,6 +8,7 @@ type RenderArgs<S, P> = {
   properties?: P;
   nested?: boolean;
   pluginConfigs?: Plugin[];
+  createApp?: boolean;
 };
 
 export type { RenderArgs };

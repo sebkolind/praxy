@@ -2,6 +2,7 @@ import {
   fireEvent,
   getAllByRole,
   getByRole,
+  getByTestId,
   getByText,
 } from '@testing-library/dom';
 import { render } from '../render';
@@ -129,27 +130,29 @@ describe('walker', () => {
     const root = document.getElementById('root');
     createApp(root, {
       view() {
-        return div(c(Component));
+        return div(c(Component), { ['data-testid']: 'app' });
       },
     });
 
-    if (!root) {
+    const app = getByTestId(document.body, 'app');
+
+    if (!app) {
       throw new Error('Root is null');
     }
 
-    const btn = getByRole(root, 'button');
+    const btn = getByRole(app, 'button');
 
-    expect(getByText(root, /one/)).toBeDefined();
-
-    fireEvent.click(btn);
-
-    expect(getByText(root, /four/)).toBeDefined();
-    expect(getAllByRole(root, 'listitem').length).toBe(4);
+    expect(getByText(app, /one/)).toBeDefined();
 
     fireEvent.click(btn);
 
-    expect(getByText(root, /one/)).toBeDefined();
-    expect(getAllByRole(root, 'listitem').length).toBe(1);
+    expect(getByText(app, /four/)).toBeDefined();
+    expect(getAllByRole(app, 'listitem').length).toBe(4);
+
+    fireEvent.click(btn);
+
+    expect(getByText(app, /one/)).toBeDefined();
+    expect(getAllByRole(app, 'listitem').length).toBe(1);
   });
 
   test('nested components', () => {
@@ -190,15 +193,17 @@ describe('walker', () => {
     const root = document.getElementById('root');
     createApp(root, {
       view() {
-        return div(c(OuterComponent));
+        return div(c(OuterComponent), { ['data-testid']: 'app' });
       },
     });
 
-    if (!root) {
+    const app = getByTestId(document.body, 'app');
+
+    if (!app) {
       throw new Error('Root is null');
     }
 
-    const outerBtn = getByText(root, /Click me outer 0/);
+    const outerBtn = getByText(app, /Click me outer 0/);
 
     expect(outerBtn).toBeDefined();
 
@@ -206,8 +211,8 @@ describe('walker', () => {
     fireEvent.click(outerBtn);
     fireEvent.click(outerBtn);
 
-    const innerBtn = getByText(root, /Click me inner 0/);
-    const inner2Btn = getByText(root, /Click me inner #2 0/);
+    const innerBtn = getByText(app, /Click me inner 0/);
+    const inner2Btn = getByText(app, /Click me inner #2 0/);
 
     expect(innerBtn).toBeDefined();
     expect(inner2Btn).toBeDefined();
@@ -218,9 +223,9 @@ describe('walker', () => {
     fireEvent.click(inner2Btn);
     fireEvent.click(inner2Btn);
 
-    expect(getByText(root, /Click me inner 2/)).toBeDefined();
-    expect(getByText(root, /Click me outer 3/)).toBeDefined();
-    expect(getByText(root, /Click me inner #2 2/)).toBeDefined();
+    expect(getByText(app, /Click me inner 2/)).toBeDefined();
+    expect(getByText(app, /Click me outer 3/)).toBeDefined();
+    expect(getByText(app, /Click me inner #2 2/)).toBeDefined();
   });
 
   test('nested components without state should not be skipped', () => {
@@ -239,7 +244,7 @@ describe('walker', () => {
     const WrapperComponent: Component<{ test: boolean }> = {
       state: { test: false },
       view() {
-        return div(c(OuterComponent));
+        return div(c(OuterComponent), { ['data-testid']: 'app' });
       },
       mounted({ state }) {
         state.test = true;
@@ -249,10 +254,12 @@ describe('walker', () => {
     const root = document.getElementById('root');
     render({ element: root, component: WrapperComponent });
 
-    if (!root) {
+    const app = getByTestId(document.body, 'app');
+
+    if (!app) {
       throw new Error('Root is null');
     }
 
-    expect(getByText(root, /Hello, world!/)).toBeDefined();
+    expect(getByText(app, /Hello, world!/)).toBeDefined();
   });
 });

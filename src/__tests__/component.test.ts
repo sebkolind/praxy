@@ -42,16 +42,18 @@ describe('components', () => {
     const root = document.getElementById('root');
     createApp(root, {
       view() {
-        return div(c(Counter));
+        return div(c(Counter), { ['data-testid']: 'app' });
       },
     });
 
-    if (!root) {
+    const app = getByTestId(document.body, 'app');
+
+    if (!app) {
       throw new Error('Root is null');
     }
 
-    const el = getByTestId(root, 'counter');
-    const btn = getByTestId(root, 'increment');
+    const el = getByTestId(app, 'counter');
+    const btn = getByTestId(app, 'increment');
 
     expect(getByText(el, /Count: 0/));
     expect(btn.className).toBe('negative');
@@ -85,17 +87,18 @@ describe('components', () => {
     const WithState: Component<{ count: number }> = {
       state: { count: 0 },
       view({ state }) {
-        return div(p(`Count: ${state.count}`));
+        return div(p(`Count: ${state.count}`), { ['data-testid']: 'app' });
       },
     };
 
     render({ element: root, component: WithState });
 
-    if (!root) {
+    const app = getByTestId(document.body, 'app');
+    if (!app) {
       throw new Error('Root is null');
     }
 
-    const el = getByText(root, /Count: 0/);
+    const el = getByText(app, /Count: 0/);
 
     expect(el).toBeDefined();
   });
@@ -121,21 +124,23 @@ describe('components', () => {
 
     createApp(root, {
       view() {
-        return div(c(KeepComponent));
+        return div(c(KeepComponent), { ['data-testid']: 'app' });
       },
     });
 
-    if (!root) {
+    const app = getByTestId(document.body, 'app');
+
+    if (!app) {
       throw new Error('Root is null');
     }
 
-    const btn = getByRole(root, 'button');
+    const btn = getByRole(app, 'button');
 
     expect(btn).toBeDefined();
 
     fireEvent.click(btn);
 
-    expect(queryByText(root, /Don't change me 0/)).toBeTruthy();
-    expect(queryByText(root, /Don't change me 1/)).toBeNull();
+    expect(queryByText(app, /Don't change me 0/)).toBeTruthy();
+    expect(queryByText(app, /Don't change me 1/)).toBeNull();
   });
 });

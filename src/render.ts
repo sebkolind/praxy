@@ -10,6 +10,7 @@ async function render<S extends {}, P extends Props>(args: RenderArgs<S, P>) {
     properties = {} as P,
     nested = false,
     pluginConfigs = [],
+    createApp = false,
   } = args;
 
   if (element == null) return;
@@ -73,7 +74,11 @@ async function render<S extends {}, P extends Props>(args: RenderArgs<S, P>) {
   node = view(context);
   node.$tent = { props, component, initState: { ...state } };
 
-  el.append(node);
+  if (createApp) {
+    el.replaceWith(node);
+  } else {
+    el.append(node);
+  }
 
   if (mounted) {
     mounted(context);
