@@ -55,13 +55,19 @@ function walker(oldNode: TentElement, newNode: TentElement, nested = false) {
   if (oc.length === 0 && nc.length === 0) return;
   if (oldNode.$tent?.keep) return;
 
-  if (oldNode.$tent.component && !nested) {
-    if (oldNode.$tent.component.view !== newNode.$tent.component?.view) {
+  if (
+    !nested &&
+    oldNode.$tent.component &&
+    newNode.$tent.component &&
+    'state' in oldNode.$tent.component &&
+    'state' in newNode.$tent.component
+  ) {
+    if (oldNode.$tent.component.state !== newNode.$tent.component.state) {
       cleanupComponent(oldNode);
       oldNode.replaceWith(newNode);
-
-      return;
     }
+
+    return;
   }
 
   for (let i = 0; i < Math.max(oc.length, nc.length); i++) {
