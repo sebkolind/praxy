@@ -23,14 +23,15 @@ async function render<S extends {}, P extends Props>(args: RenderArgs<S, P>) {
   const { init, view, mounted } = component;
 
   if (init != null) {
-    init().then((state) => {
-      delete component.init;
-      render({
-        element,
-        component: { ...component, state } as Component<S, P>,
-        properties,
-        nested,
-      });
+    const state = await init();
+
+    delete component.init;
+
+    render({
+      element,
+      component: { ...component, state } as Component<S, P>,
+      properties,
+      nested,
     });
 
     return;
